@@ -35,5 +35,13 @@ namespace Copycat
 
             return uniqueFileName;
         }
+        public byte[] ImageToByteArray(Image image)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.Save(ms, image.RawFormat);
+                return ms.ToArray();
+            }
+        }
     }
 }

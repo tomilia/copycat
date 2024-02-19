@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Copycat.Model;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 
@@ -8,7 +9,7 @@ namespace Copycat.Controllers;
 [Route("[controller]")]
 public class CopyController : ControllerBase
 {
-    private readonly FileService _fileUpload;
+    private readonly FileService _fileUploadService;
     private readonly ILogger<CopyController> _logger;
     private readonly string _filePath = "D:\\Workspace\\FileUpload";
     private IConnectionMultiplexer _conn;
@@ -19,7 +20,7 @@ public class CopyController : ControllerBase
         _logger = logger;
         _redis = redis.GetDatabase();
         _conn = redis;
-        _fileUpload = fileUpload;
+        _fileUploadService = fileUpload;
     }
 
     [HttpPost]
@@ -70,7 +71,7 @@ public class CopyController : ControllerBase
     {
         string targetDirectory = _filePath;
 
-        string fileName = await _fileUpload.Upload(file, targetDirectory);
+        string fileName = await _fileUploadService.Upload(file, targetDirectory);
 
         if (fileName == null)
         {
@@ -106,12 +107,18 @@ public class CopyController : ControllerBase
     [HttpGet("GetFiles")]
     public IActionResult GetFiles()
     {
+        List<FileModel> file = new();
 
         // Get a list of file names in the specified directory
-        string[] fileNames = Directory.GetFiles(_filePath)
-            .Select(Path.GetFileName)
+        FileModel[] fileNames = Directory.GetFiles(_filePath)
+            .Select(f => new FileModel
+            {
+                Name = Path.GetFileName(f),
+                Preview = _fileUploadService.ImageToByteArray(_fileUploadService.GetPreviewThumbnail(f, 100, 100))
+            }
+             )
             .ToArray();
-
+        
         return Ok(fileNames);
     }
     [HttpPost("File/Delete/{filename}")]
