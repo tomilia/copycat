@@ -110,13 +110,18 @@ public class CopyController : ControllerBase
         List<FileModel> file = new();
 
         // Get a list of file names in the specified directory
+        
         FileModel[] fileNames = Directory.GetFiles(_filePath)
-            .Select(f => new FileModel
+            .Select(f =>
             {
-                Name = Path.GetFileName(f),
-                Preview = _fileUploadService.ImageToByteArray(_fileUploadService.GetPreviewThumbnail(f, 100, 100))
+                string ext = Path.GetExtension(f);
+                return new FileModel
+                {
+                    Name = Path.GetFileName(f),
+                    Preview = ext == ".jpeg" || ext == ".png" || ext == ".jpg" ? _fileUploadService.ImageToByteArray(_fileUploadService.GetPreviewThumbnail(f, 200, 200)) : null
+                };
             }
-             )
+            )
             .ToArray();
         
         return Ok(fileNames);

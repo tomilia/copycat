@@ -1,14 +1,20 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Copycat
 {
     public class FileService
     {
+        private bool ThumbnailCallback()
+        {
+            return false;
+        }
         public Image GetPreviewThumbnail(string filePath, int thumbnailWidth, int thumbnailHeight)
         {
             using (Image originalImage = Image.FromFile(filePath))
             {
-                Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, null, IntPtr.Zero);
+                Image.GetThumbnailImageAbort callback = new Image.GetThumbnailImageAbort(ThumbnailCallback);
+                Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, callback, IntPtr.Zero);
                 return thumbnail;
             }
         }
@@ -39,7 +45,7 @@ namespace Copycat
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                image.Save(ms, image.RawFormat);
+                image.Save(ms, ImageFormat.Jpeg);
                 return ms.ToArray();
             }
         }
