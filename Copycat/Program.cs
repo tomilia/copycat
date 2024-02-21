@@ -4,19 +4,18 @@ using StackExchange.Redis;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
-
+string _filePath = "/FileUpload";
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<FileService>();
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("redis"));
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
     builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
-builder.WebHost.UseUrls("http://192.168.50.197:5277");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,7 +25,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+if (!Directory.Exists(_filePath))
+{
+    Directory.CreateDirectory(_filePath);
+}
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

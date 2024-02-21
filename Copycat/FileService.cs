@@ -1,4 +1,10 @@
-﻿using System.Drawing;
+﻿
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 using System.Drawing.Imaging;
 
 namespace Copycat
@@ -11,12 +17,13 @@ namespace Copycat
         }
         public Image GetPreviewThumbnail(string filePath, int thumbnailWidth, int thumbnailHeight)
         {
-            using (Image originalImage = Image.FromFile(filePath))
-            {
-                Image.GetThumbnailImageAbort callback = new Image.GetThumbnailImageAbort(ThumbnailCallback);
-                Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, callback, IntPtr.Zero);
-                return thumbnail;
-            }
+            Image originalImage = Image.Load(filePath);
+                originalImage.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(thumbnailWidth, thumbnailHeight),
+                    Mode = ResizeMode.Max
+                }));
+                return originalImage;
         }
         public async Task<string> Upload(IFormFile file, string targetDirectory)
         {
@@ -41,13 +48,17 @@ namespace Copycat
 
             return uniqueFileName;
         }
-        public byte[] ImageToByteArray(Image image)
+        public string ImageToByteArray(Image image)
         {
-            using (MemoryStream ms = new MemoryStream())
+            string base64String;
+            using (var ms = new MemoryStream())
             {
-                image.Save(ms, ImageFormat.Jpeg);
-                return ms.ToArray();
+                image.Save(ms, new JpegEncoder());
+                byte[] imageBytes = ms.ToArray();
+                base64String = Convert.ToBase64String(imageBytes);
+                imageBytes = null;
             }
+            return base64String;
         }
     }
 }

@@ -11,7 +11,7 @@ public class CopyController : ControllerBase
 {
     private readonly FileService _fileUploadService;
     private readonly ILogger<CopyController> _logger;
-    private readonly string _filePath = "D:\\Workspace\\FileUpload";
+    private readonly string _filePath = "/FileUpload";
     private IConnectionMultiplexer _conn;
     private readonly IDatabase _redis;
 
@@ -21,6 +21,7 @@ public class CopyController : ControllerBase
         _redis = redis.GetDatabase();
         _conn = redis;
         _fileUploadService = fileUpload;
+
     }
 
     [HttpPost]

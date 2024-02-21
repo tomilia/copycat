@@ -48,6 +48,9 @@ WORKDIR /app
 # Copy everything needed to run the app from the "build" stage.
 COPY --from=build /app .
 
+USER root
+RUN mkdir -p /FileUpload
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
@@ -59,6 +62,8 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
-USER appuser
 
+RUN chown appuser /FileUpload
+
+USER appuser
 ENTRYPOINT ["dotnet", "Copycat.dll"]
