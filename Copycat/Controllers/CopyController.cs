@@ -45,7 +45,7 @@ public class CopyController : ControllerBase
         EndPoint endPoint = _conn.GetEndPoints().First();
         RedisKey[] keys = _conn.GetServer(endPoint)
             .Keys(pattern: "*")
-            .OrderBy(e => DateTime.Parse(e.ToString()))
+           // .OrderBy(e => DateTime.Parse(e.ToString()))
             .ToArray();
 
         return (await _redis.StringGetAsync(keys))
