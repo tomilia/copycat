@@ -11,6 +11,8 @@
 networks:
   copycatnet:
     name: copycatnet
+    external: true
+    driver: bridge
 services:
   redis:
     image: redis:latest
