@@ -9,9 +9,8 @@
 # https://github.com/docker/awesome-compose
 
 networks: 
-  default: 
-    external: 
-      name: copycatnet 
+  copycatnet:
+    external:true
 
 services:
   redis:
