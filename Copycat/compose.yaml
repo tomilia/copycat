@@ -9,10 +9,10 @@
 # https://github.com/docker/awesome-compose
 
 networks:
-  copycatnet:
-    name: copycatnet
-    external: true
-    driver: bridge
+  mynetwork:
+    external:
+      name: mynetwork
+
 services:
   redis:
     image: redis:latest
@@ -22,7 +22,7 @@ services:
     environment:
       - REDIS_PORT=6379
     networks:
-      - copycatnet
+      - mynetwork
   server:
     build:
       context: .
@@ -33,7 +33,7 @@ services:
     depends_on:
       - redis
     networks:
-      - copycatnet
+      - mynetwork
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
 # start the database before your application. The `db-data` volume persists the
