@@ -29,9 +29,10 @@ public class CopyController : ControllerBase
     public ActionResult SetNewWord(string word)
     {
         var expirationTime = DateTime.UtcNow.AddDays(1);
-        var currentTimestamp = DateTime.Now.ToString();
+        var currentTimestamp = $"words-{DateTime.Now}";
 
         _redis.StringSet(currentTimestamp, word);
+        
         // Set the expiration time on the key
         _redis.KeyExpireAsync(currentTimestamp, expirationTime).GetAwaiter().GetResult();
 
@@ -44,7 +45,7 @@ public class CopyController : ControllerBase
     {
         EndPoint endPoint = _conn.GetEndPoints().First();
         RedisKey[] keys = _conn.GetServer(endPoint)
-            .Keys(pattern: "*")
+            .Keys(pattern: "words-*")
            // .OrderBy(e => DateTime.Parse(e.ToString()))
             .ToArray();
 
